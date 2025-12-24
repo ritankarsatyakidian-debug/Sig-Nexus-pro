@@ -1,0 +1,7 @@
+{
+  "name": "Sig-Nexus-Pro",
+  "description": "A high-fidelity secure mesh, energy grid, and nano-building simulator with integrated AI strategists and secret labs.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
