@@ -1,8 +1,6 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-
 /**
  * Main chatbot logic using the high-intelligence Pro model.
  * Focused on accuracy, technical correctness, and specific personality traits.
@@ -11,6 +9,8 @@ export const generateAIResponse = async (
   character: string,
   userMessage: string
 ) => {
+  // Initialize GoogleGenAI with named parameter and process.env.API_KEY
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
     const model = 'gemini-3-pro-preview';
     
@@ -44,19 +44,21 @@ export const generateAIResponse = async (
         You are cryptic, mischievous, and might hint at easter eggs or 'unauthorized' protocols. Use tech-puns and visual glitch metaphors.`
     };
 
-  const response = await ai.models.generateContent({
+    // simplified contents usage as per latest sdk guidelines
+    const response = await ai.models.generateContent({
       model,
-      contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+      contents: userMessage,
       config: {
         systemInstruction: systemInstructions[character.toLowerCase()] || "You are an expert advisor in the Sig-Nexus ecosystem.",
         temperature: character === 'dian' ? 1.1 : 0.7,
       },
     });
 
+    // access text property directly as per GenerateContentResponse definition
     return response.text || "Handshake timeout. Signal lost in the mesh.";
   } catch (error) {
     console.error("Gemini Pro API Error:", error);
-    return "Handshake failed. Encryption tunnel unstable. Ensure your API key is correctly configured.";
+    return "Handshake failed. Encryption tunnel unstable. Ensure your API key is correctly configured in Vercel environment variables.";
   }
 };
 
@@ -64,6 +66,7 @@ export const generateAIResponse = async (
  * Fast, accurate analysis for specific simulation data using the Flash model.
  */
 export const analyzeSimulationData = async (mode: string, stateData: any) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
     const model = 'gemini-3-flash-preview';
     const prompt = `
@@ -79,15 +82,17 @@ export const analyzeSimulationData = async (mode: string, stateData: any) => {
       Return the results in a clean Markdown format. Be technically accurate based on the data provided.
     `;
     
+    // simplified contents usage
     const response = await ai.models.generateContent({
       model,
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      contents: prompt,
       config: {
         systemInstruction: "You are a high-speed diagnostic AI for the Sig-Nexus. Be accurate, concise, and technical.",
-        temperature: 0.2, // Low temperature for higher accuracy in data analysis
+        temperature: 0.2, 
       },
     });
 
+    // access text property directly
     return response.text || "Diagnostic stream interrupted. System nominal.";
   } catch (error) {
     console.error("Gemini Flash API Error:", error);

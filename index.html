@@ -3,8 +3,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0b1120">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Sig-Nexus-Pro | Forge Nexus</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2103/2103633.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @keyframes glitch {
@@ -36,6 +41,9 @@
       background: #334155;
       border-radius: 10px;
     }
+    body {
+      overscroll-behavior-y: contain;
+    }
   </style>
 <script type="importmap">
 {
@@ -50,5 +58,7 @@
 </head>
 <body class="bg-[#0b1120] text-[#e2e8f0] overflow-hidden m-0 p-0 font-sans h-screen">
   <div id="root"></div>
+  <!-- Entry point for the application -->
+  <script type="module" src="index.tsx"></script>
 </body>
 </html>

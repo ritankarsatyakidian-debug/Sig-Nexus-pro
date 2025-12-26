@@ -31,29 +31,36 @@ export interface MeshMessage {
   timestamp: number;
 }
 
+export type EnergyCategory = 'GENERATION' | 'STORAGE' | 'LOAD' | 'EXPERIMENTAL';
+
 export interface EnergyComponent {
+  id: string;
   subtype: string;
+  category: EnergyCategory;
   x: number;
   y: number;
   w: number;
   h: number;
   color: string;
   power: number;
-  cost: number;
+  health: number;
   label: string;
 }
 
 export interface Atom {
+  id: string;
   element: string;
   x: number;
   y: number;
   color: string;
   radius: number;
+  charge: number;
 }
 
 export interface Bond {
-  a: Atom;
-  b: Atom;
+  aId: string;
+  bId: string;
+  strength: number;
 }
 
 export interface Particle {
@@ -62,6 +69,7 @@ export interface Particle {
   vx: number;
   vy: number;
   life: number;
+  color?: string;
 }
 
 export interface AICharacter {
