@@ -1,6 +1,16 @@
 
 export type AppMode = 'MESH' | 'ENERGY' | 'NANO' | 'AI_CHAT' | 'LABS';
 
+export interface GlobalModifiers {
+  gravityFailure: boolean;
+  overclockMode: boolean;
+  ritankarManifesto: boolean;
+  satyakiGame: boolean;
+  saanviLibrary: boolean;
+  digitalPet: boolean;
+  saanviQuestProgress: number; 
+}
+
 export interface MeshNode {
   id: string;
   role: string;
@@ -15,20 +25,24 @@ export interface MeshNode {
 
 export interface Packet {
   id: string;
-  x: number;
-  y: number;
+  sx: number;
+  sy: number;
   tx: number;
   ty: number;
   type: 'PING' | 'MSG';
   progress: number;
   speed: number;
+  payload?: any;
 }
 
 export interface MeshMessage {
+  id: string;
   senderId: string;
   targetId: string;
   text: string;
   timestamp: number;
+  isEncrypted: boolean;
+  status: 'SENDING' | 'DELIVERED' | 'DECRYPTING';
 }
 
 export type EnergyCategory = 'GENERATION' | 'STORAGE' | 'LOAD' | 'EXPERIMENTAL';
@@ -45,6 +59,7 @@ export interface EnergyComponent {
   power: number;
   health: number;
   label: string;
+  isDragging?: boolean;
 }
 
 export interface Atom {
@@ -55,21 +70,21 @@ export interface Atom {
   color: string;
   radius: number;
   charge: number;
+  isDragging?: boolean;
 }
 
 export interface Bond {
+  id: string;
   aId: string;
   bId: string;
   strength: number;
 }
 
-export interface Particle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  life: number;
-  color?: string;
+export interface Achievement {
+  id: string;
+  title: string;
+  icon: string;
+  unlocked: boolean;
 }
 
 export interface AICharacter {
@@ -79,11 +94,4 @@ export interface AICharacter {
   description: string;
   avatar: string;
   accent: string;
-}
-
-export interface Achievement {
-  id: string;
-  title: string;
-  icon: string;
-  unlocked: boolean;
 }
