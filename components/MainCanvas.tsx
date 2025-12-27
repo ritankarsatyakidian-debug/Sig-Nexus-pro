@@ -71,24 +71,33 @@ const MainCanvas = forwardRef<{ addPacket: (p: any) => void }, MainCanvasProps>(
     window.addEventListener('resize', resize);
 
     if (meshNodes.current.length === 0) {
-      // Forge Initial Nodes
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      
+      // Forge Initial Nodes - Focused in the Center
       meshNodes.current.push({
-        id: 'ARCHITECT-01', role: 'Forge Prime', x: canvas.width / 2, y: canvas.height / 3, 
+        id: 'ARCHITECT-01', role: 'Forge Prime', x: centerX, y: centerY - 40, 
         radius: 0, targetRadius: 20, type: 'ME', lat: 0, lon: 0
       });
+      
       for(let i=1; i<=5; i++) {
+        const angle = (i / 5) * Math.PI * 2;
+        const dist = 80 + Math.random() * 30;
         meshNodes.current.push({
           id: `SIM-PEER-${i}`, role: 'Neural Simulator', 
-          x: Math.random() * canvas.width, y: Math.random() * (canvas.height * 0.7), 
+          x: centerX + Math.cos(angle) * dist, 
+          y: centerY + Math.sin(angle) * dist, 
           radius: 0, targetRadius: 15, type: 'AI_SIM', lat: 0, lon: 0
         });
       }
       
       // Feature: User Joins Mesh node creation
       setTimeout(() => {
+        const joinAngle = Math.random() * Math.PI * 2;
         meshNodes.current.push({
           id: 'NEW-USER-JOIN', role: 'Remote Guest', 
-          x: Math.random() * canvas.width, y: Math.random() * canvas.height, 
+          x: centerX + Math.cos(joinAngle) * 150, 
+          y: centerY + Math.sin(joinAngle) * 150, 
           radius: 0, targetRadius: 18, type: 'REAL_PEER', lat: 0, lon: 0
         });
         unlockAchievement('first_ping');

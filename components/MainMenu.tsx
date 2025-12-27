@@ -40,8 +40,8 @@ const MainMenu: React.FC<Props> = ({ onStart }) => {
       {/* Instructions Popup */}
       {showInstructions && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="w-full max-w-lg bg-[#0b1120] border-2 border-cyan-500/50 rounded-3xl p-8 shadow-[0_0_50px_rgba(6,182,212,0.2)] animate-in zoom-in-95 duration-300">
-            <div className="flex items-center gap-3 mb-6">
+          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[#0b1120] border-2 border-cyan-500/50 rounded-3xl p-5 lg:p-8 shadow-[0_0_50px_rgba(6,182,212,0.2)] animate-in zoom-in-95 duration-300 custom-scrollbar">
+            <div className="flex items-center gap-3 mb-6 sticky top-0 bg-[#0b1120] py-2 z-10">
               <div className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse"></div>
               <h2 className="text-xl font-black tracking-tighter uppercase italic">Operational Directive</h2>
             </div>
@@ -54,12 +54,14 @@ const MainMenu: React.FC<Props> = ({ onStart }) => {
               <p><span className="text-yellow-400 font-bold">5. NEXUS AUDIT:</span> Use the AI Analysis tool in any mode to get real-time optimization strategies for your current build.</p>
             </div>
 
-            <button 
-              onClick={() => setShowInstructions(false)}
-              className="w-full py-4 bg-cyan-500 text-black font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-cyan-400 transition-all active:scale-95 shadow-[0_0_20px_rgba(6,182,212,0.4)]"
-            >
-              Sync & Initialize
-            </button>
+            <div className="sticky bottom-0 bg-[#0b1120] pt-4 pb-2">
+              <button 
+                onClick={() => setShowInstructions(false)}
+                className="w-full py-4 bg-cyan-500 text-black font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-cyan-400 transition-all active:scale-95 shadow-[0_0_20px_rgba(6,182,212,0.4)] text-xs lg:text-sm"
+              >
+                Sync & Initialize
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -77,19 +79,19 @@ const MainMenu: React.FC<Props> = ({ onStart }) => {
       {/* Main Content */}
       <div className="relative z-10 text-center flex flex-col items-center max-w-2xl px-6">
         <div className="mb-12 relative group">
-          <h1 className="text-5xl lg:text-7xl font-black tracking-tighter leading-none select-none">
+          <h1 className="text-4xl lg:text-7xl font-black tracking-tighter leading-none select-none">
             SIG<span className="text-cyan-500">-</span>NEXUS
-            <div className="text-xl lg:text-2xl font-light tracking-[0.5em] text-slate-500 mt-2">PRO EDITION</div>
+            <div className="text-lg lg:text-2xl font-light tracking-[0.5em] text-slate-500 mt-2">PRO EDITION</div>
           </h1>
         </div>
 
         <div className="space-y-8 w-full">
           <button 
             onClick={onStart}
-            className="group relative px-12 py-5 bg-transparent border border-cyan-500/30 rounded-full overflow-hidden transition-all hover:border-cyan-400 hover:shadow-[0_0_40px_rgba(34,211,238,0.2)] active:scale-95"
+            className="group relative px-10 lg:px-12 py-4 lg:py-5 bg-transparent border border-cyan-500/30 rounded-full overflow-hidden transition-all hover:border-cyan-400 hover:shadow-[0_0_40px_rgba(34,211,238,0.2)] active:scale-95"
           >
             <div className="absolute inset-0 bg-cyan-500/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-            <span className="relative text-sm font-black tracking-[0.4em] uppercase text-cyan-400 group-hover:text-white transition-colors">Enter Forge</span>
+            <span className="relative text-xs lg:text-sm font-black tracking-[0.4em] uppercase text-cyan-400 group-hover:text-white transition-colors">Enter Forge</span>
           </button>
 
           <div className="flex flex-col items-center">
