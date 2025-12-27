@@ -49,18 +49,28 @@ const App: React.FC = () => {
 
   const handleCommandResult = (cmd: string) => {
     const c = cmd.toLowerCase().trim();
+    
+    // Ibhan Easter Egg (Diplomat)
     if (c === 'bel-iq-z' || c === 'moonwalk') {
       setModifiers(m => ({ ...m, gravityFailure: true }));
       setTimeout(() => setModifiers(m => ({ ...m, gravityFailure: false })), 15000);
-    } else if (c === 'taiq' || c === 'overclock') {
+    } 
+    // Soumyadeepta Easter Egg (Engineer)
+    else if (c === 'taiq' || c === 'overclock') {
       setModifiers(m => ({ ...m, overclockMode: true }));
       setTimeout(() => setModifiers(m => ({ ...m, overclockMode: false })), 60000);
       unlockAchievement('glitch_hunter');
-    } else if (c === 'spiderstrange' || c === 'powerlingx' || c === 'ritankar') {
+    } 
+    // Ritankar Easter Egg (Founder)
+    else if (c === 'spiderstrange' || c === 'powerlingx' || c === 'ritankar') {
       setModifiers(m => ({ ...m, ritankarManifesto: true }));
-    } else if (c === 'saanvi' || c === 'library') {
+    } 
+    // Saanvi Easter Egg
+    else if (c === 'saanvi' || c === 'library') {
       setModifiers(m => ({ ...m, saanviLibrary: true }));
-    } else if (c === 'linginfinity' || c === 'labs') {
+    } 
+    // Dian's Hidden Labs (Risk Navigator)
+    else if (c === 'linginfinity' || c === 'labs') {
       setIsLabsUnlocked(true);
       if (c === 'linginfinity') setMode('LABS');
     }
@@ -148,17 +158,18 @@ const App: React.FC = () => {
 
           {modifiers.ritankarManifesto && (
             <div className="fixed inset-0 z-[400] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className="bg-slate-300 border-2 border-slate-500 shadow-[4px_4px_0_black] p-1 w-full max-w-[320px] rounded-sm animate-in zoom-in-95">
+              <div className="bg-slate-300 border-2 border-slate-500 shadow-[4px_4px_0_black] p-1 w-full max-w-[400px] rounded-sm animate-in zoom-in-95">
                 <div className="bg-[#000080] text-white px-2 py-1 flex justify-between items-center text-[10px] font-bold">
-                  <span>SIG-MANIFESTO.TXT</span>
+                  <span>sigmax-infinity force NET.ExEz</span>
                   <button onClick={() => setModifiers(m => ({ ...m, ritankarManifesto: false }))} className="bg-slate-300 text-black px-1 border border-slate-600">×</button>
                 </div>
-                <div className="p-4 bg-black text-[#00ff00] font-mono text-[9px] h-[200px] overflow-y-auto no-scrollbar">
-                   <p className="mb-4">ARCHITECT: RITANKAR</p>
-                   <p className="leading-tight">
-                    "Sig-Nexus is not a simulation. It is the framework for a new digital consensus. Those who bridge the mesh command the energy. Reality is modular. Forge everything."
+                <div className="p-6 bg-black text-[#00ff00] font-mono text-[10px] h-[250px] overflow-y-auto no-scrollbar">
+                   <p className="mb-4 text-cyan-400 font-bold border-b border-cyan-900 pb-1">PROTOCOL: FOUNDER_ACCESS</p>
+                   <p className="leading-relaxed">
+                    "POWERLINGX IS ONE OF THE BEST COUNTRIES, TAIQ AND BEL-IQZ ARE GOOD TOO. POWERLINGX HAS BUILT MANY APPS AND WEBSITES AND BUILT MANY DEVICES, AND POWERLINGX IS A COUNTRY IN THE WORLD OF SIGMAX PLANET AND ITS FOUNDER IS RITANKAR CHAKRABORTY."
                    </p>
-                   <div className="mt-8 text-center text-4xl grayscale brightness-50">🔑</div>
+                   <div className="mt-12 text-center text-5xl grayscale brightness-75 animate-pulse">👑</div>
+                   <p className="mt-4 text-[8px] text-slate-500 text-center uppercase tracking-widest">© 1990-2025 Sigmax Interstellar</p>
                 </div>
               </div>
             </div>
