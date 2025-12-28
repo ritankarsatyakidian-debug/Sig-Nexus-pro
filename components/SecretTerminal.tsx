@@ -21,7 +21,8 @@ const SecretTerminal: React.FC<{ onClose: () => void, onCommandResult?: (cmd: st
       case 'glitch': toggleGlitch(); response = 'BREACH INITIATED.'; break;
       case 'ritankar': case 'spiderstrange': case 'powerlingx': response = 'FOUNDER KEY DETECTED. OPENING sigmax-infinity force NET.ExEz...'; break;
       case 'saanvi': response = 'BRIDGE LIBRARY ACCESS GRANTED.'; break;
-      case 'bel-iq-z': case 'moonwalk': response = 'GRAVITY_UNIT_FAILURE: IBHAN DIPLOMACY ACTIVATED. OBJECTS DISPLACED.'; break;
+      case 'bel-iq-z': response = 'INITIATING DIPLOMATIC PROTOCOL: CONSTITUTION LOADING...'; break;
+      case 'moonwalk': response = 'GRAVITY_UNIT_FAILURE: OBJECTS DISPLACED.'; break;
       case 'taiq': case 'overclock': response = 'SOUMYADEEPTA TURBO MODE: 500% BOOST ACTIVATED.'; break;
       case 'clear': setHistory([]); return;
       case 'exit': onClose(); return;

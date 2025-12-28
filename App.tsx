@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [glitchMode, setGlitchMode] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showConstitution, setShowConstitution] = useState(false); // New state for Constitution
   const [arsenalHeight, setArsenalHeight] = useState(180);
   const [isArsenalOpen, setIsArsenalOpen] = useState(true);
   const [achievements, setAchievements] = useState<Achievement[]>(INITIAL_ACHIEVEMENTS);
@@ -50,8 +51,12 @@ const App: React.FC = () => {
   const handleCommandResult = (cmd: string) => {
     const c = cmd.toLowerCase().trim();
     
-    // Ibhan Easter Egg (Diplomat)
-    if (c === 'bel-iq-z' || c === 'moonwalk') {
+    // Bel-IQ-Z Easter Egg (Constitution)
+    if (c === 'bel-iq-z') {
+      setShowConstitution(true);
+    }
+    // Ibhan Moonwalk (Gravity Failure)
+    else if (c === 'moonwalk') {
       setModifiers(m => ({ ...m, gravityFailure: true }));
       setTimeout(() => setModifiers(m => ({ ...m, gravityFailure: false })), 15000);
     } 
@@ -156,6 +161,7 @@ const App: React.FC = () => {
             </div>
           )}
 
+          {/* Ritankar Manifesto Modal */}
           {modifiers.ritankarManifesto && (
             <div className="fixed inset-0 z-[400] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
               <div className="bg-slate-300 border-2 border-slate-500 shadow-[4px_4px_0_black] p-1 w-full max-w-[400px] rounded-sm animate-in zoom-in-95">
@@ -175,6 +181,7 @@ const App: React.FC = () => {
             </div>
           )}
 
+          {/* Saanvi Library Modal */}
           {modifiers.saanviLibrary && (
              <div className="fixed inset-0 z-[400] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
                 <div className="bg-[#0b1120] border border-pink-500/50 p-6 w-full max-w-[280px] rounded-2xl animate-in zoom-in-95">
@@ -187,6 +194,7 @@ const App: React.FC = () => {
              </div>
           )}
 
+          {/* Satyaki Game Modal */}
           {modifiers.satyakiGame && (
              <div className="fixed inset-0 z-[500] bg-black/95 flex items-center justify-center p-4">
                 <div className="w-full max-w-[280px] aspect-video bg-black border-4 border-red-600 rounded-xl p-4 flex flex-col items-center justify-center shadow-[0_0_80px_rgba(220,38,38,0.4)]">
@@ -198,6 +206,40 @@ const App: React.FC = () => {
                    </div>
                 </div>
              </div>
+          )}
+
+          {/* Bel-IQ-Z Constitution Modal */}
+          {showConstitution && (
+            <div className="fixed inset-0 z-[450] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+              <div className="bg-[#fffff0] text-[#1a202c] w-full max-w-[400px] p-8 rounded-sm shadow-[0_0_60px_rgba(255,255,255,0.2)] animate-in zoom-in-95 relative overflow-hidden">
+                <div className="relative z-10 text-center font-serif border-4 border-double border-[#2d3748] p-4 h-full">
+                  <div className="mb-4 text-4xl">📜</div>
+                  <h2 className="text-2xl font-black uppercase mb-1 tracking-widest text-[#2d3748] border-b-2 border-[#2d3748] inline-block pb-1">Constitution</h2>
+                  <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] mb-6 text-[#4a5568] mt-2">Bel-IQ-Z • Powerlingx • Taiq</h3>
+                  
+                  <p className="text-xs leading-relaxed mb-8 font-medium italic text-justify px-2">
+                    "We, the undersigned, hereby declare our allegiance to the Triple Alliance. As citizens of Bel-IQ-Z, Powerlingx, and Taiq, we vow to uphold the principles of Innovation, Resilience, and Code."
+                  </p>
+
+                  <div className="relative group">
+                    <input 
+                      type="text" 
+                      placeholder="Sign Name Here..." 
+                      className="w-full bg-transparent border-b-2 border-[#2d3748] text-center text-xl font-bold italic p-2 outline-none placeholder:text-gray-400 text-[#1a202c]"
+                    />
+                  </div>
+
+                  <button 
+                    onClick={() => setShowConstitution(false)}
+                    className="mt-8 px-6 py-2 bg-[#2d3748] text-[#fffff0] font-bold text-xs uppercase tracking-[0.15em] hover:bg-black transition-all shadow-lg"
+                  >
+                    Ratify & Seal
+                  </button>
+                  
+                  <div className="mt-4 text-[8px] text-gray-500 uppercase tracking-widest">Official Document • Nexus Archive</div>
+                </div>
+              </div>
+            </div>
           )}
 
           {mode === 'LABS' && (
