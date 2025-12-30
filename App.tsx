@@ -38,7 +38,7 @@ const App: React.FC = () => {
   const [allMeshMessages, setAllMeshMessages] = useState<MeshMessage[]>([]);
   
   const getSimDataRef = useRef<() => any>(() => ({}));
-  const canvasHandleRef = useRef<{ addPacket: (p: any) => void } | null>(null);
+  const canvasHandleRef = useRef<{ addPacket: (p: any) => void; addItem: (type: string, subtype: string, x?: number, y?: number) => void } | null>(null);
 
   const unlockAchievement = (id: string) => {
     setAchievements(prev => {
@@ -126,6 +126,10 @@ const App: React.FC = () => {
     };
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+  };
+
+  const handleManualDrop = (type: string, subtype: string, x?: number, y?: number) => {
+    canvasHandleRef.current?.addItem(type, subtype, x, y);
   };
 
   if (!isInitialized) {
@@ -283,6 +287,7 @@ const App: React.FC = () => {
                     meshMessages={allMeshMessages.filter(m => m.senderId === selectedNode?.id || m.targetId === selectedNode?.id)}
                     onSendMeshMessage={handleSendMeshMessage} 
                     onCloseMeshChat={() => setSelectedNode(null)}
+                    onManualDrop={handleManualDrop}
                   />
                 </div>
               )}

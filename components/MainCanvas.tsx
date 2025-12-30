@@ -17,7 +17,7 @@ interface MainCanvasProps {
 const GRID_SIZE = 40;
 const ENERGY_BOND_DIST = 160;
 
-const MainCanvas = forwardRef<{ addPacket: (p: any) => void }, MainCanvasProps>(({ 
+const MainCanvas = forwardRef<{ addPacket: (p: any) => void; addItem: (type: string, subtype: string, x?: number, y?: number) => void }, MainCanvasProps>(({ 
   mode, 
   modifiers,
   setModifiers,
@@ -39,6 +39,27 @@ const MainCanvas = forwardRef<{ addPacket: (p: any) => void }, MainCanvasProps>(
   const bondSource = useRef<string | null>(null);
   const mousePos = useRef({ x: 0, y: 0 });
 
+  // Core spawning logic taking Grid Coordinates
+  const spawnEntity = (type: string, subtype: string, gridX: number, gridY: number) => {
+     if (mode === 'ENERGY' && type === 'ENERGY') {
+      const specs: any = {
+        solar: { w: 32, h: 32, color: '#f59e0b', label: 'SOLAR' },
+        nuclear: { w: 48, h: 48, color: '#dc2626', label: 'CORE' },
+        hydro: { w: 40, h: 32, color: '#2563eb', label: 'HYDRO' },
+        fusion: { w: 64, h: 64, color: '#9333ea', label: 'FUS' },
+        battery: { w: 40, h: 24, color: '#10b981', label: 'BATT' },
+        transfm: { w: 36, h: 36, color: '#4b5563', label: 'XFRM' },
+        load: { w: 30, h: 30, color: '#ef4444', label: 'LOAD' },
+        wind: { w: 32, h: 48, color: '#38bdf8', label: 'WIND' },
+        capacitor: { w: 24, h: 24, color: '#ec4899', label: 'CAP' }
+      };
+      if (specs[subtype]) energyComponents.current.push({ ...specs[subtype], id: Math.random().toString(), x: gridX, y: gridY, subtype, health: 100 });
+    } else if (mode === 'NANO' && type === 'NANO') {
+      const colors: any = { H: '#fff', C: '#444', O: '#f00', N: '#33f', Si: '#aaa', Fe: '#888', Au: '#fd0', U: '#0f0' };
+      nanoAtoms.current.push({ id: Math.random().toString(), element: subtype, x: gridX, y: gridY, color: colors[subtype] || '#888', radius: 12, charge: 0 });
+    }
+  };
+
   useImperativeHandle(ref, () => ({
     addPacket: (data: any) => {
       const source = meshNodes.current.find(n => n.id === data.senderId);
@@ -54,6 +75,29 @@ const MainCanvas = forwardRef<{ addPacket: (p: any) => void }, MainCanvasProps>(
           payload: data.payload
         });
       }
+    },
+    // Enhanced addItem that handles both coordinate drops and "center spawn" (Tap to Add)
+    addItem: (type: string, subtype: string, clientX?: number, clientY?: number) => {
+      if (!canvasRef.current) return;
+      const rect = canvasRef.current.getBoundingClientRect();
+      
+      let gridX, gridY;
+
+      if (clientX !== undefined && clientY !== undefined) {
+        // Precise drop (Drag & Drop)
+        gridX = Math.round((clientX - rect.left) / GRID_SIZE) * GRID_SIZE;
+        gridY = Math.round((clientY - rect.top) / GRID_SIZE) * GRID_SIZE;
+      } else {
+        // Center spawn (Tap to Add)
+        gridX = Math.round((rect.width / 2) / GRID_SIZE) * GRID_SIZE;
+        gridY = Math.round((rect.height / 2) / GRID_SIZE) * GRID_SIZE;
+        
+        // Add slight jitter so multiple taps don't stack perfectly
+        gridX += (Math.floor(Math.random() * 3) - 1) * GRID_SIZE; 
+        gridY += (Math.floor(Math.random() * 3) - 1) * GRID_SIZE;
+      }
+      
+      spawnEntity(type, subtype, gridX, gridY);
     }
   }));
 
@@ -74,7 +118,6 @@ const MainCanvas = forwardRef<{ addPacket: (p: any) => void }, MainCanvasProps>(
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
       
-      // Forge Initial Nodes - Focused in the Center
       meshNodes.current.push({
         id: 'ARCHITECT-01', role: 'Forge Prime', x: centerX, y: centerY - 40, 
         radius: 0, targetRadius: 20, type: 'ME', lat: 0, lon: 0
@@ -91,7 +134,6 @@ const MainCanvas = forwardRef<{ addPacket: (p: any) => void }, MainCanvasProps>(
         });
       }
       
-      // Feature: User Joins Mesh node creation
       setTimeout(() => {
         const joinAngle = Math.random() * Math.PI * 2;
         meshNodes.current.push({
@@ -163,7 +205,6 @@ const MainCanvas = forwardRef<{ addPacket: (p: any) => void }, MainCanvasProps>(
     };
 
     const renderEnergy = (ctx: CanvasRenderingContext2D, speed: number) => {
-      // Automatic Bonding Logic: Connect nearby components visually
       energyComponents.current.forEach((c, i) => {
         energyComponents.current.slice(i+1).forEach(c2 => {
           const d = Math.hypot(c.x - c2.x, c.y - c2.y);
@@ -217,11 +258,7 @@ const MainCanvas = forwardRef<{ addPacket: (p: any) => void }, MainCanvasProps>(
     return () => { cancelAnimationFrame(frameId); window.removeEventListener('resize', resize); };
   }, [mode, modifiers, selectedNodeId]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    const rect = canvasRef.current!.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
+  const handlePointerDown = (x: number, y: number) => {
     if (mode === 'NANO') {
       const atom = nanoAtoms.current.find(a => Math.hypot(x - a.x, y - a.y) < a.radius + 10);
       if (atom) {
@@ -248,17 +285,42 @@ const MainCanvas = forwardRef<{ addPacket: (p: any) => void }, MainCanvasProps>(
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     const rect = canvasRef.current!.getBoundingClientRect();
-    mousePos.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    handlePointerDown(x, y);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault(); 
+    const rect = canvasRef.current!.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    handlePointerDown(x, y);
+  };
+
+  const handlePointerMove = (x: number, y: number) => {
+    mousePos.current = { x, y };
     if (draggingItem.current && draggingItem.current.type === 'MESH') {
       const node = meshNodes.current.find(n => n.id === draggingItem.current!.id);
-      if (node) { node.x = mousePos.current.x; node.y = mousePos.current.y; }
+      if (node) { node.x = x; node.y = y; }
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = canvasRef.current!.getBoundingClientRect();
+    handlePointerMove(e.clientX - rect.left, e.clientY - rect.top);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const rect = canvasRef.current!.getBoundingClientRect();
+    const touch = e.touches[0];
+    handlePointerMove(touch.clientX - rect.left, touch.clientY - rect.top);
+  };
+
+  const handlePointerUp = () => {
     if (draggingItem.current) {
       const snapX = Math.round(mousePos.current.x / GRID_SIZE) * GRID_SIZE;
       const snapY = Math.round(mousePos.current.y / GRID_SIZE) * GRID_SIZE;
@@ -278,34 +340,20 @@ const MainCanvas = forwardRef<{ addPacket: (p: any) => void }, MainCanvasProps>(
     e.preventDefault();
     const subtype = e.dataTransfer.getData('subtype');
     const type = e.dataTransfer.getData('type');
-    const rect = canvasRef.current!.getBoundingClientRect();
-    const x = Math.round((e.clientX - rect.left) / GRID_SIZE) * GRID_SIZE;
-    const y = Math.round((e.clientY - rect.top) / GRID_SIZE) * GRID_SIZE;
-
-    if (mode === 'ENERGY' && type === 'ENERGY') {
-      const specs: any = {
-        solar: { w: 32, h: 32, color: '#f59e0b', label: 'SOLAR' },
-        nuclear: { w: 48, h: 48, color: '#dc2626', label: 'CORE' },
-        hydro: { w: 40, h: 32, color: '#2563eb', label: 'HYDRO' },
-        fusion: { w: 64, h: 64, color: '#9333ea', label: 'FUS' },
-        battery: { w: 40, h: 24, color: '#10b981', label: 'BATT' },
-        transfm: { w: 36, h: 36, color: '#4b5563', label: 'XFRM' },
-        load: { w: 30, h: 30, color: '#ef4444', label: 'LOAD' },
-        wind: { w: 32, h: 48, color: '#38bdf8', label: 'WIND' },
-        capacitor: { w: 24, h: 24, color: '#ec4899', label: 'CAP' }
-      };
-      if (specs[subtype]) energyComponents.current.push({ ...specs[subtype], id: Math.random().toString(), x, y, subtype, health: 100 });
-    } else if (mode === 'NANO' && type === 'NANO') {
-      const colors: any = { H: '#fff', C: '#444', O: '#f00', N: '#33f', Si: '#aaa', Fe: '#888', Au: '#fd0', U: '#0f0' };
-      nanoAtoms.current.push({ id: Math.random().toString(), element: subtype, x, y, color: colors[subtype] || '#888', radius: 12, charge: 0 });
+    if (canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const gridX = Math.round((e.clientX - rect.left) / GRID_SIZE) * GRID_SIZE;
+      const gridY = Math.round((e.clientY - rect.top) / GRID_SIZE) * GRID_SIZE;
+      spawnEntity(type, subtype, gridX, gridY);
     }
   };
 
   return (
     <div className="w-full h-full relative overflow-hidden" 
          onDragOver={e => e.preventDefault()} onDrop={handleDrop}
-         onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
-      <canvas ref={canvasRef} className="block w-full h-full" />
+         onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handlePointerUp}
+         onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handlePointerUp}>
+      <canvas ref={canvasRef} className="block w-full h-full touch-none" />
     </div>
   );
 });

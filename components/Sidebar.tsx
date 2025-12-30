@@ -13,6 +13,7 @@ interface SidebarProps {
   meshMessages?: MeshMessage[];
   onSendMeshMessage?: (targetId: string, text: string) => void;
   onCloseMeshChat?: () => void;
+  onManualDrop?: (type: string, subtype: string, x?: number, y?: number) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -22,7 +23,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   selectedMeshNode,
   meshMessages,
   onSendMeshMessage,
-  onCloseMeshChat
+  onCloseMeshChat,
+  onManualDrop
 }) => {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -37,20 +39,44 @@ const Sidebar: React.FC<SidebarProps> = ({
     onAction('analyze');
   };
 
-  const DraggableItem: React.FC<{ subtype: string, color: string, label: string, icon?: string }> = ({ subtype, color, label, icon }) => (
-    <div 
-      draggable 
-      onDragStart={(e) => {
-        e.dataTransfer.setData('subtype', subtype);
-        e.dataTransfer.setData('type', mode);
-      }}
-      className="min-w-[100px] h-[70px] p-2 bg-slate-900/60 border border-slate-800 rounded-xl cursor-grab active:cursor-grabbing hover:border-cyan-500/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center gap-1 shadow-md shrink-0"
-    >
-      <span className="text-lg">{icon}</span>
-      <span className="text-[8px] font-black text-slate-300 uppercase text-center leading-none">{label}</span>
-      <div className="w-4 h-0.5 mt-1 rounded-full" style={{ backgroundColor: color }} />
-    </div>
-  );
+  const DraggableItem: React.FC<{ subtype: string, color?: string, label?: string, icon?: string }> = ({ subtype, color, label, icon }) => {
+    // Mobile Touch Drag Logic
+    const handleTouchEnd = (e: React.TouchEvent) => {
+      const touch = e.changedTouches[0];
+      const element = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (element && element.tagName === 'CANVAS') {
+        onManualDrop?.(mode, subtype, touch.clientX, touch.clientY);
+      }
+    };
+    
+    // Tap to Spawn Logic (Reliable Mobile Fallback)
+    const handleClick = () => {
+      onManualDrop?.(mode, subtype);
+    };
+
+    return (
+      <div 
+        draggable 
+        onDragStart={(e) => {
+          e.dataTransfer.setData('subtype', subtype);
+          e.dataTransfer.setData('type', mode);
+        }}
+        onTouchEnd={handleTouchEnd}
+        onClick={handleClick}
+        className={`min-w-[100px] h-[70px] p-2 bg-slate-900/60 border border-slate-800 rounded-xl cursor-grab active:cursor-grabbing hover:border-cyan-500/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center gap-1 shadow-md shrink-0 ${mode === 'NANO' ? 'w-12 h-12 min-w-[48px] h-[48px]' : ''}`}
+      >
+        {mode === 'NANO' ? (
+          <span className="text-slate-100 text-[10px] font-black">{subtype}</span>
+        ) : (
+          <>
+            <span className="text-lg">{icon}</span>
+            <span className="text-[8px] font-black text-slate-300 uppercase text-center leading-none">{label}</span>
+            <div className="w-4 h-0.5 mt-1 rounded-full" style={{ backgroundColor: color }} />
+          </>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="h-full w-full flex overflow-hidden relative">
@@ -111,17 +137,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {mode === 'NANO' && (
           <div className="flex gap-3 items-center h-full">
             {['H', 'C', 'O', 'N', 'Si', 'Fe', 'Au', 'U'].map(el => (
-              <div 
-                key={el}
-                draggable 
-                onDragStart={(e) => {
-                  e.dataTransfer.setData('subtype', el);
-                  e.dataTransfer.setData('type', mode);
-                }}
-                className="w-12 h-12 flex flex-col items-center justify-center bg-slate-900 border border-slate-800 rounded-xl text-xs font-black hover:border-purple-500 transition-all cursor-grab shadow-sm shrink-0"
-              >
-                <span className="text-slate-100 text-[10px]">{el}</span>
-              </div>
+              <DraggableItem key={el} subtype={el} />
             ))}
           </div>
         )}
